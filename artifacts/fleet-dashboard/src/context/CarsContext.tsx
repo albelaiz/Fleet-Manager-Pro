@@ -27,8 +27,14 @@ export interface Activity {
   id: string;
   kind: ActivityKind;
   severity: ActivitySeverity;
-  title: string;
-  detail: string;
+  /** i18n key for the title, e.g. "activity.added" */
+  titleKey: string;
+  /** Optional override params merged into title interpolation */
+  titleParams?: Record<string, string>;
+  /** i18n key for the detail body */
+  detailKey: string;
+  /** Interpolation params for the detail key */
+  detailParams: Record<string, string>;
   timestamp: string;
 }
 
@@ -51,20 +57,23 @@ export function CarsProvider({ children }: { children: ReactNode }) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const seededRef = useRef(false);
 
-  const pushActivity = useCallback((a: Omit<Activity, "id" | "timestamp">) => {
-    setActivities((prev) =>
-      [
-        {
-          ...a,
-          id: makeId("act"),
-          timestamp: new Date().toISOString(),
-        },
-        ...prev,
-      ].slice(0, 60),
-    );
-  }, []);
+  const pushActivity = useCallback(
+    (a: Omit<Activity, "id" | "timestamp">) => {
+      setActivities((prev) =>
+        [
+          {
+            ...a,
+            id: makeId("act"),
+            timestamp: new Date().toISOString(),
+          },
+          ...prev,
+        ].slice(0, 60),
+      );
+    },
+    [],
+  );
 
-  // Seed initial alert activities from current fleet state.
+  // Seed initial alert activities from current fleet state
   useEffect(() => {
     if (seededRef.current) return;
     seededRef.current = true;
@@ -80,8 +89,14 @@ export function CarsProvider({ children }: { children: ReactNode }) {
             id: makeId("seed"),
             kind: "alert",
             severity: m.severity === "critical" ? "critical" : "warning",
-            title: `${m.label} alert`,
-            detail: `${car.brand} ${car.model} (${car.plate}) — ${m.detail}`,
+            titleKey: m.labelKey,
+            detailKey: "activity.alertDetail",
+            detailParams: {
+              brand: car.brand,
+              model: car.model,
+              plate: car.plate,
+              detail: `__metric__:${m.detailKey}:${JSON.stringify(m.detailParams)}`,
+            },
             timestamp: new Date(
               now.getTime() - Math.floor(Math.random() * 6 * 3600 * 1000),
             ).toISOString(),
@@ -93,8 +108,14 @@ export function CarsProvider({ children }: { children: ReactNode }) {
           id: makeId("seed"),
           kind: "rented",
           severity: "info",
-          title: "Vehicle rented",
-          detail: `${car.brand} ${car.model} rented by ${car.currentRental.renter.name} (${car.currentRental.renter.id})`,
+          titleKey: "activity.rented",
+          detailKey: "activity.rentedDetail",
+          detailParams: {
+            brand: car.brand,
+            model: car.model,
+            name: car.currentRental.renter.name,
+            id: car.currentRental.renter.id,
+          },
           timestamp: car.currentRental.startDate,
         });
       }
@@ -118,8 +139,13 @@ export function CarsProvider({ children }: { children: ReactNode }) {
       pushActivity({
         kind: "added",
         severity: "info",
-        title: "Vehicle added",
-        detail: `${newCar.brand} ${newCar.model} (${newCar.plate}) joined the fleet`,
+        titleKey: "activity.added",
+        detailKey: "activity.addedDetail",
+        detailParams: {
+          brand: newCar.brand,
+          model: newCar.model,
+          plate: newCar.plate,
+        },
       });
     },
     [pushActivity],
@@ -145,8 +171,14 @@ export function CarsProvider({ children }: { children: ReactNode }) {
         pushActivity({
           kind: "rented",
           severity: "info",
-          title: "Vehicle rented",
-          detail: `${target.brand} ${target.model} rented by ${input.renterName} (${input.renterId})`,
+          titleKey: "activity.rented",
+          detailKey: "activity.rentedDetail",
+          detailParams: {
+            brand: target.brand,
+            model: target.model,
+            name: input.renterName,
+            id: input.renterId,
+          },
         });
       }
     },
@@ -168,8 +200,13 @@ export function CarsProvider({ children }: { children: ReactNode }) {
         pushActivity({
           kind: "returned",
           severity: "info",
-          title: "Vehicle returned",
-          detail: `${target.brand} ${target.model} (${target.plate}) is back in the fleet`,
+          titleKey: "activity.returned",
+          detailKey: "activity.returnedDetail",
+          detailParams: {
+            brand: target.brand,
+            model: target.model,
+            plate: target.plate,
+          },
         });
       }
     },

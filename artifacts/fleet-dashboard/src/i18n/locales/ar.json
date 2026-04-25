@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "overview": "نظرة عامة",
+    "timeline": "الجدول الزمني"
+  },
+  "header": {
+    "addVehicle": "إضافة مركبة",
+    "alerts": "تنبيهات",
+    "language": "اللغة",
+    "theme": "المظهر"
+  },
+  "page": {
+    "commandCenter": "مركز التحكم",
+    "masterTimeline": "الجدول الزمني الرئيسي",
+    "subtitleOverview": "أدر مركباتك، إيجاراتك، وصيانتها.",
+    "subtitleTimeline": "اسحب أفقياً لتصفح التقويم. انقر على إيجار لعرض ملف المستأجر."
+  },
+  "stats": {
+    "totalFleet": "إجمالي الأسطول",
+    "available": "متاحة",
+    "onRent": "مؤجرة",
+    "alerts": "التنبيهات",
+    "density": "كثافة 7 أيام"
+  },
+  "fleet": {
+    "title": "الأسطول",
+    "filter": "تصفية المركبات...",
+    "empty": "لا توجد مركبات تطابق بحثك.",
+    "rentOut": "تأجير",
+    "return": "إرجاع",
+    "markReturned": "تعليم كمُرجَع"
+  },
+  "status": {
+    "Available": "متاحة",
+    "Rented": "مؤجرة",
+    "Maintenance": "في الصيانة"
+  },
+  "maintenance": {
+    "title": "نبض الصيانة",
+    "atRisk": "{{count}} في خطر",
+    "tires": "الإطارات",
+    "oil": "الزيت",
+    "insurance": "التأمين",
+    "healthy": "سليمة",
+    "warning": "تحذير",
+    "critical": "حرجة",
+    "allHealthy": "جميع المركبات ضمن الحدود الصحية.",
+    "kmLeft": "{{km}} كم متبقية",
+    "kmOver": "{{km}} كم زائدة",
+    "daysLeft": "{{count}} يوم متبقي",
+    "daysOverdue": "متأخر {{count}} يوم",
+    "dueToday": "مستحق اليوم",
+    "expiresToday": "ينتهي اليوم",
+    "daysExpired": "منتهٍ منذ {{count}} يوم",
+    "inDays": "خلال {{count}} يوم"
+  },
+  "timeline": {
+    "vehicle": "المركبة",
+    "active": "إيجار نشط",
+    "today": "اليوم",
+    "weekend": "نهاية الأسبوع",
+    "subtitle": "انقر على أي إيجار لعرض ملف المستأجر."
+  },
+  "renter": {
+    "activeRental": "إيجار نشط",
+    "vehicle": "المركبة",
+    "rental": "الإيجار",
+    "documents": "المستندات",
+    "start": "البداية",
+    "end": "النهاية",
+    "contact": "جهة الاتصال",
+    "rentalId": "معرّف الإيجار",
+    "idCard": "بطاقة الهوية",
+    "contract": "العقد",
+    "idCardSub": "ممسوحة · موثقة",
+    "contractSub": "موقّع",
+    "timeRemaining": "الوقت المتبقي",
+    "daysLeft": "{{count}} يوم متبقي",
+    "hoursLeft": "{{count}} ساعة متبقية",
+    "overdue": "متأخر"
+  },
+  "addCar": {
+    "title": "إضافة مركبة",
+    "description": "أدخل التفاصيل وحدود الصيانة للسيارة الجديدة.",
+    "vehicleDetails": "تفاصيل المركبة",
+    "thresholds": "حدود الصيانة",
+    "plate": "اللوحة",
+    "year": "السنة",
+    "brand": "الصانع",
+    "model": "الطراز",
+    "currentKm": "العداد الحالي",
+    "oilChangeKm": "تغيير الزيت عند الكم",
+    "tireChangeDate": "تاريخ تغيير الإطارات",
+    "insuranceDate": "انتهاء التأمين",
+    "save": "حفظ المركبة",
+    "added": "تمت إضافة المركبة",
+    "addedDescription": "تمت إضافة {{brand}} {{model}} إلى الأسطول.",
+    "errors": {
+      "plate": "اللوحة مطلوبة",
+      "brand": "الصانع مطلوب",
+      "model": "الطراز مطلوب",
+      "required": "مطلوب"
+    }
+  },
+  "rentDialog": {
+    "title": "تأجير المركبة",
+    "renterName": "اسم المستأجر",
+    "idNumber": "رقم الهوية",
+    "rentalPeriod": "فترة الإيجار",
+    "pickRange": "اختر نطاق التواريخ",
+    "idCardScan": "مسح بطاقة الهوية",
+    "uploadCta": "امسح أو ارفع بطاقة الهوية",
+    "uploadHint": "JPG, PNG · تبقى على الجهاز",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد الإيجار",
+    "rentedToast": "تم تأجير المركبة",
+    "rentedToastBody": "{{brand}} {{model}} ستعود في {{date}}.",
+    "errors": {
+      "name": "اسم المستأجر مطلوب.",
+      "id": "رقم هوية المستأجر مطلوب.",
+      "range": "يرجى اختيار تاريخ بداية ونهاية.",
+      "image": "يرجى رفع ملف صورة."
+    }
+  },
+  "activity": {
+    "title": "النشاط",
+    "subtitle": "الأحداث الأخيرة",
+    "empty": "لا يوجد نشاط بعد.",
+    "added": "تمت إضافة مركبة",
+    "rented": "تم تأجير مركبة",
+    "returned": "تم إرجاع مركبة",
+    "alertSuffix": "تنبيه",
+    "addedDetail": "انضمت {{brand}} {{model}} ({{plate}}) إلى الأسطول",
+    "rentedDetail": "تم تأجير {{brand}} {{model}} لـ {{name}} ({{id}})",
+    "returnedDetail": "عادت {{brand}} {{model}} ({{plate}}) إلى الأسطول",
+    "alertDetail": "{{brand}} {{model}} ({{plate}}) — {{detail}}"
+  },
+  "upcomingReturns": "العودات القادمة",
+  "noActiveRentals": "لا توجد إيجارات نشطة.",
+  "common": {
+    "in": "خلال {{value}}",
+    "overdue": "متأخر"
+  }
+}

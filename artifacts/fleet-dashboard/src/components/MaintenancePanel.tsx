@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { differenceInDays } from "date-fns";
+import { useTranslation } from "react-i18next";
 import { useCars } from "../context/CarsContext";
 import { MaintenanceRing } from "./MaintenanceRing";
 import { getCarHealth, type Severity } from "../lib/maintenance";
@@ -40,6 +41,7 @@ const severityRank: Record<Severity, number> = {
 
 export function MaintenancePanel() {
   const { cars } = useCars();
+  const { t } = useTranslation();
 
   const ranked = useMemo(() => {
     const now = new Date();
@@ -59,10 +61,10 @@ export function MaintenancePanel() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          Maintenance Pulse
+          {t("maintenance.title")}
         </h2>
         <span className="text-[10px] text-muted-foreground tabular-nums font-mono">
-          {ranked.length} at risk
+          {t("maintenance.atRisk", { count: ranked.length })}
         </span>
       </div>
 
@@ -70,7 +72,7 @@ export function MaintenancePanel() {
         <div className="card-glass rounded-xl p-6 text-center">
           <ShieldAlert className="w-5 h-5 mx-auto text-muted-foreground mb-2" />
           <p className="text-xs text-muted-foreground">
-            All vehicles within healthy thresholds.
+            {t("maintenance.allHealthy")}
           </p>
         </div>
       ) : (
@@ -111,7 +113,7 @@ export function MaintenancePanel() {
                         : "bg-amber-500/15 text-amber-400 border border-amber-500/30"
                     }`}
                   >
-                    {health.overallSeverity}
+                    {t(`maintenance.${health.overallSeverity}`)}
                   </span>
                 </div>
 
@@ -119,20 +121,20 @@ export function MaintenancePanel() {
                   <MaintenanceRing
                     progress={tireProgress(car, now)}
                     severity={tire.severity}
-                    label="Tires"
-                    value={tire.detail}
+                    label={t(tire.labelKey)}
+                    value={t(tire.detailKey, tire.detailParams)}
                   />
                   <MaintenanceRing
                     progress={oilProgress(car)}
                     severity={oil.severity}
-                    label="Oil"
-                    value={oil.detail}
+                    label={t(oil.labelKey)}
+                    value={t(oil.detailKey, oil.detailParams)}
                   />
                   <MaintenanceRing
                     progress={insuranceProgress(car, now)}
                     severity={ins.severity}
-                    label="Insurance"
-                    value={ins.detail}
+                    label={t(ins.labelKey)}
+                    value={t(ins.detailKey, ins.detailParams)}
                   />
                 </div>
               </motion.div>

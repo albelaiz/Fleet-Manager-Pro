@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
@@ -26,23 +27,24 @@ import { useCars } from "../context/CarsContext";
 import { useToast } from "../hooks/use-toast";
 import { Separator } from "./ui/separator";
 
-const formSchema = z.object({
-  plate: z.string().min(2, "Plate is required"),
-  brand: z.string().min(1, "Brand is required"),
-  model: z.string().min(1, "Model is required"),
-  year: z.coerce.number().min(1990).max(2030),
-  currentKm: z.coerce.number().min(0),
-  oilChangeKm: z.coerce.number().min(0),
-  tireChangeDate: z.string().min(1, "Required"),
-  insuranceDate: z.string().min(1, "Required"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
 export function AddCarSheet() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { addCar } = useCars();
   const { toast } = useToast();
+
+  const formSchema = z.object({
+    plate: z.string().min(2, t("addCar.errors.plate")),
+    brand: z.string().min(1, t("addCar.errors.brand")),
+    model: z.string().min(1, t("addCar.errors.model")),
+    year: z.coerce.number().min(1990).max(2030),
+    currentKm: z.coerce.number().min(0),
+    oilChangeKm: z.coerce.number().min(0),
+    tireChangeDate: z.string().min(1, t("addCar.errors.required")),
+    insuranceDate: z.string().min(1, t("addCar.errors.required")),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -73,8 +75,11 @@ export function AddCarSheet() {
     setOpen(false);
     form.reset();
     toast({
-      title: "Vehicle added",
-      description: `${data.brand} ${data.model} added to the fleet.`,
+      title: t("addCar.added"),
+      description: t("addCar.addedDescription", {
+        brand: data.brand,
+        model: data.model,
+      }),
     });
   };
 
@@ -82,16 +87,14 @@ export function AddCarSheet() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1.5 h-8 px-3">
-          <Plus className="w-3.5 h-3.5" /> Add vehicle
+          <Plus className="w-3.5 h-3.5" /> {t("header.addVehicle")}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto pr-0 glass-panel !bg-transparent border-l shadow-2xl">
-        <div className="pr-6">
+      <SheetContent className="w-full sm:max-w-md overflow-y-auto pe-0 glass-panel !bg-transparent shadow-2xl">
+        <div className="pe-6">
           <SheetHeader className="mb-6">
-            <SheetTitle className="text-xl">Add vehicle</SheetTitle>
-            <SheetDescription>
-              Enter details and maintenance thresholds for the new car.
-            </SheetDescription>
+            <SheetTitle className="text-xl">{t("addCar.title")}</SheetTitle>
+            <SheetDescription>{t("addCar.description")}</SheetDescription>
           </SheetHeader>
 
           <Form {...form}>
@@ -101,7 +104,7 @@ export function AddCarSheet() {
             >
               <div className="space-y-4">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Vehicle details
+                  {t("addCar.vehicleDetails")}
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -109,7 +112,9 @@ export function AddCarSheet() {
                     name="plate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Plate</FormLabel>
+                        <FormLabel className="text-xs">
+                          {t("addCar.plate")}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="XYZ-123"
@@ -126,7 +131,9 @@ export function AddCarSheet() {
                     name="year"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Year</FormLabel>
+                        <FormLabel className="text-xs">
+                          {t("addCar.year")}
+                        </FormLabel>
                         <FormControl>
                           <Input type="number" {...field} className="h-9" />
                         </FormControl>
@@ -141,13 +148,11 @@ export function AddCarSheet() {
                     name="brand"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Brand</FormLabel>
+                        <FormLabel className="text-xs">
+                          {t("addCar.brand")}
+                        </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Toyota"
-                            {...field}
-                            className="h-9"
-                          />
+                          <Input {...field} className="h-9" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -158,13 +163,11 @@ export function AddCarSheet() {
                     name="model"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Model</FormLabel>
+                        <FormLabel className="text-xs">
+                          {t("addCar.model")}
+                        </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Corolla"
-                            {...field}
-                            className="h-9"
-                          />
+                          <Input {...field} className="h-9" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -177,7 +180,7 @@ export function AddCarSheet() {
 
               <div className="space-y-4">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Maintenance thresholds
+                  {t("addCar.thresholds")}
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -186,7 +189,7 @@ export function AddCarSheet() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">
-                          Current km
+                          {t("addCar.currentKm")}
                         </FormLabel>
                         <FormControl>
                           <Input type="number" {...field} className="h-9" />
@@ -201,7 +204,7 @@ export function AddCarSheet() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">
-                          Oil change at km
+                          {t("addCar.oilChangeKm")}
                         </FormLabel>
                         <FormControl>
                           <Input type="number" {...field} className="h-9" />
@@ -218,7 +221,7 @@ export function AddCarSheet() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">
-                          Tire change date
+                          {t("addCar.tireChangeDate")}
                         </FormLabel>
                         <FormControl>
                           <Input type="date" {...field} className="h-9" />
@@ -233,7 +236,7 @@ export function AddCarSheet() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">
-                          Insurance expiry
+                          {t("addCar.insuranceDate")}
                         </FormLabel>
                         <FormControl>
                           <Input type="date" {...field} className="h-9" />
@@ -247,7 +250,7 @@ export function AddCarSheet() {
 
               <SheetFooter className="mt-8">
                 <Button type="submit" className="w-full">
-                  Save vehicle
+                  {t("addCar.save")}
                 </Button>
               </SheetFooter>
             </form>

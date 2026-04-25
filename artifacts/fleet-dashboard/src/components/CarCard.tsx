@@ -1,26 +1,31 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { format, differenceInHours } from "date-fns";
 import { Car } from "../data/types";
 import { getCarHealth, type HealthMetric } from "../lib/maintenance";
-import { format, differenceInHours } from "date-fns";
 import { RentCarDialog } from "./RentCarDialog";
 import { Button } from "./ui/button";
 import { useCars } from "../context/CarsContext";
 import { ChevronRight, CornerDownLeft } from "lucide-react";
+import { useLocale } from "../hooks/useLocale";
 
 function HealthDot({ metric }: { metric: HealthMetric }) {
+  const { t } = useTranslation();
   const isCritical = metric.severity === "critical";
-  const isWarning = metric.severity === "warning";
 
   let dotColor = "bg-emerald-500";
   let pingColor = "bg-red-400";
   if (isCritical) dotColor = "bg-red-500";
-  else if (isWarning) dotColor = "bg-amber-500";
+  else if (metric.severity === "warning") dotColor = "bg-amber-500";
+
+  const label = t(metric.labelKey);
+  const detail = t(metric.detailKey, metric.detailParams);
 
   return (
     <div
       className="flex items-center gap-1.5 text-xs text-muted-foreground"
-      title={`${metric.label}: ${metric.detail}`}
+      title={`${label}: ${detail}`}
     >
       <span className="relative flex h-1.5 w-1.5">
         {isCritical && (
@@ -32,7 +37,7 @@ function HealthDot({ metric }: { metric: HealthMetric }) {
           className={`relative inline-flex rounded-full h-1.5 w-1.5 ${dotColor}`}
         />
       </span>
-      <span>{metric.label}</span>
+      <span>{label}</span>
     </div>
   );
 }
@@ -46,16 +51,6 @@ function useNow(intervalMs = 60_000) {
   return now;
 }
 
-function formatCountdown(endDate: string, now: Date) {
-  const end = new Date(endDate);
-  const hours = differenceInHours(end, now);
-  if (hours <= 0) return "overdue";
-  const d = Math.floor(hours / 24);
-  const h = hours % 24;
-  if (d > 0) return `in ${d}d ${h}h`;
-  return `in ${h}h`;
-}
-
 interface Props {
   car: Car;
   index?: number;
@@ -63,12 +58,25 @@ interface Props {
 }
 
 export function CarCard({ car, index = 0, onOpenRenter }: Props) {
+  const { t } = useTranslation();
+  const { dateFnsLocale } = useLocale();
   const now = useNow();
   const health = getCarHealth(car, now);
   const { returnCar } = useCars();
-  const countdown = car.currentRental
-    ? formatCountdown(car.currentRental.endDate, now)
-    : null;
+
+  let countdown: string | null = null;
+  if (car.currentRental) {
+    const end = new Date(car.currentRental.endDate);
+    const hours = differenceInHours(end, now);
+    if (hours <= 0) {
+      countdown = t("common.overdue");
+    } else {
+      const d = Math.floor(hours / 24);
+      const h = hours % 24;
+      const value = d > 0 ? `${d}d ${h}h` : `${h}h`;
+      countdown = t("common.in", { value });
+    }
+  }
 
   let statusDot = "bg-emerald-500";
   if (car.status === "Rented") statusDot = "bg-primary";
@@ -97,7 +105,7 @@ export function CarCard({ car, index = 0, onOpenRenter }: Props) {
           </h3>
           <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-background/40 text-[11px] font-medium whitespace-nowrap">
             <span className={`h-1.5 w-1.5 rounded-full ${statusDot}`} />
-            {car.status}
+            {t(`status.${car.status}`)}
           </div>
         </div>
         <p className="text-xs font-mono text-muted-foreground tabular-nums">
@@ -111,18 +119,23 @@ export function CarCard({ car, index = 0, onOpenRenter }: Props) {
           <button
             type="button"
             onClick={() => onOpenRenter?.(car)}
-            className="text-left bg-background/30 rounded-lg p-3 border border-white/[0.04] hover:border-white/10 hover:bg-background/50 transition-colors group"
+            className="text-start bg-background/30 rounded-lg p-3 border border-white/[0.04] hover:border-white/10 hover:bg-background/50 transition-colors group"
           >
             <div className="flex justify-between items-center gap-2">
               <span className="font-medium text-sm truncate">
                 {car.currentRental.renter.name}
               </span>
-              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-60 group-hover:opacity-100 transition-all rtl:rotate-180" />
             </div>
             <div className="flex justify-between items-center text-xs text-muted-foreground tabular-nums font-mono mt-1">
               <span>
-                {format(new Date(car.currentRental.startDate), "MMM d")} →{" "}
-                {format(new Date(car.currentRental.endDate), "MMM d")}
+                {format(new Date(car.currentRental.startDate), "MMM d", {
+                  locale: dateFnsLocale,
+                })}{" "}
+                →{" "}
+                {format(new Date(car.currentRental.endDate), "MMM d", {
+                  locale: dateFnsLocale,
+                })}
               </span>
               <span className="font-medium text-foreground">{countdown}</span>
             </div>
@@ -144,7 +157,8 @@ export function CarCard({ car, index = 0, onOpenRenter }: Props) {
               className="h-7 px-2.5 text-xs gap-1 text-muted-foreground"
               onClick={() => returnCar(car.id)}
             >
-              <CornerDownLeft className="w-3 h-3" /> Return
+              <CornerDownLeft className="w-3 h-3 rtl:rotate-180" />{" "}
+              {t("fleet.return")}
             </Button>
           )}
         </div>

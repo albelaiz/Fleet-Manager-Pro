@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "overview": "Aperçu",
+    "timeline": "Calendrier"
+  },
+  "header": {
+    "addVehicle": "Ajouter un véhicule",
+    "alerts": "Alertes",
+    "language": "Langue",
+    "theme": "Thème"
+  },
+  "page": {
+    "commandCenter": "Centre de commande",
+    "masterTimeline": "Calendrier principal",
+    "subtitleOverview": "gérez vos véhicules, locations et maintenance.",
+    "subtitleTimeline": "Faites défiler horizontalement le calendrier. Cliquez sur une location pour voir le locataire."
+  },
+  "stats": {
+    "totalFleet": "Flotte totale",
+    "available": "Disponibles",
+    "onRent": "En location",
+    "alerts": "Alertes",
+    "density": "Densité 7 jours"
+  },
+  "fleet": {
+    "title": "Flotte",
+    "filter": "Filtrer les véhicules...",
+    "empty": "Aucun véhicule ne correspond à votre recherche.",
+    "rentOut": "Louer",
+    "return": "Retour",
+    "markReturned": "Marquer comme rendu"
+  },
+  "status": {
+    "Available": "Disponible",
+    "Rented": "Loué",
+    "Maintenance": "Maintenance"
+  },
+  "maintenance": {
+    "title": "Pulse de maintenance",
+    "atRisk": "{{count}} à risque",
+    "tires": "Pneus",
+    "oil": "Huile",
+    "insurance": "Assurance",
+    "healthy": "sain",
+    "warning": "alerte",
+    "critical": "critique",
+    "allHealthy": "Tous les véhicules sont dans les seuils de santé.",
+    "kmLeft": "{{km}} km restants",
+    "kmOver": "{{km}} km dépassés",
+    "daysLeft": "{{count}} j restants",
+    "daysOverdue": "{{count}} j de retard",
+    "dueToday": "à faire aujourd'hui",
+    "expiresToday": "expire aujourd'hui",
+    "daysExpired": "{{count}} j expirés",
+    "inDays": "dans {{count}} j"
+  },
+  "timeline": {
+    "vehicle": "Véhicule",
+    "active": "Location active",
+    "today": "Aujourd'hui",
+    "weekend": "Week-end",
+    "subtitle": "Cliquez sur une location pour voir le profil du locataire."
+  },
+  "renter": {
+    "activeRental": "Location active",
+    "vehicle": "Véhicule",
+    "rental": "Location",
+    "documents": "Documents",
+    "start": "Début",
+    "end": "Fin",
+    "contact": "Contact",
+    "rentalId": "ID Location",
+    "idCard": "Carte d'identité",
+    "contract": "Contrat",
+    "idCardSub": "Numérisée · vérifiée",
+    "contractSub": "Signé",
+    "timeRemaining": "Temps restant",
+    "daysLeft": "{{count}} jours restants",
+    "hoursLeft": "{{count}} heures restantes",
+    "overdue": "en retard"
+  },
+  "addCar": {
+    "title": "Ajouter un véhicule",
+    "description": "Saisissez les détails et les seuils de maintenance pour la nouvelle voiture.",
+    "vehicleDetails": "Détails du véhicule",
+    "thresholds": "Seuils de maintenance",
+    "plate": "Plaque",
+    "year": "Année",
+    "brand": "Marque",
+    "model": "Modèle",
+    "currentKm": "Km actuels",
+    "oilChangeKm": "Vidange au km",
+    "tireChangeDate": "Date changement pneus",
+    "insuranceDate": "Expiration assurance",
+    "save": "Enregistrer le véhicule",
+    "added": "Véhicule ajouté",
+    "addedDescription": "{{brand}} {{model}} ajouté à la flotte.",
+    "errors": {
+      "plate": "Plaque requise",
+      "brand": "Marque requise",
+      "model": "Modèle requis",
+      "required": "Requis"
+    }
+  },
+  "rentDialog": {
+    "title": "Louer le véhicule",
+    "renterName": "Nom du locataire",
+    "idNumber": "Numéro d'ID",
+    "rentalPeriod": "Période de location",
+    "pickRange": "Choisir une période",
+    "idCardScan": "Scan de la carte d'identité",
+    "uploadCta": "Scanner ou téléverser la carte",
+    "uploadHint": "JPG, PNG · reste sur l'appareil",
+    "cancel": "Annuler",
+    "confirm": "Confirmer la location",
+    "rentedToast": "Véhicule loué",
+    "rentedToastBody": "{{brand}} {{model}} retour le {{date}}.",
+    "errors": {
+      "name": "Nom du locataire requis.",
+      "id": "ID du locataire requis.",
+      "range": "Veuillez choisir une date de début et de fin.",
+      "image": "Veuillez téléverser une image."
+    }
+  },
+  "activity": {
+    "title": "Activité",
+    "subtitle": "Évènements récents",
+    "empty": "Aucune activité.",
+    "added": "Véhicule ajouté",
+    "rented": "Véhicule loué",
+    "returned": "Véhicule rendu",
+    "alertSuffix": "alerte",
+    "addedDetail": "{{brand}} {{model}} ({{plate}}) a rejoint la flotte",
+    "rentedDetail": "{{brand}} {{model}} loué par {{name}} ({{id}})",
+    "returnedDetail": "{{brand}} {{model}} ({{plate}}) est de retour dans la flotte",
+    "alertDetail": "{{brand}} {{model}} ({{plate}}) — {{detail}}"
+  },
+  "upcomingReturns": "Retours à venir",
+  "noActiveRentals": "Aucune location active.",
+  "common": {
+    "in": "dans {{value}}",
+    "overdue": "en retard"
+  }
+}

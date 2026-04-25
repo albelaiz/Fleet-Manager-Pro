@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { differenceInDays, differenceInHours, format } from "date-fns";
+import { useTranslation } from "react-i18next";
 import {
   CalendarDays,
   CornerDownLeft,
@@ -12,6 +13,7 @@ import {
 import type { Car } from "../data/types";
 import { Button } from "./ui/button";
 import { useCars } from "../context/CarsContext";
+import { useLocale } from "../hooks/useLocale";
 
 interface Props {
   car: Car | null;
@@ -38,6 +40,8 @@ function initials(name: string) {
 
 export function RenterProfileDrawer({ car, onClose }: Props) {
   const { returnCar } = useCars();
+  const { t } = useTranslation();
+  const { dateFnsLocale, rtl } = useLocale();
   const open = !!car && !!car.currentRental;
 
   return (
@@ -53,15 +57,17 @@ export function RenterProfileDrawer({ car, onClose }: Props) {
             onClick={onClose}
           />
           <motion.aside
-            initial={{ x: "100%" }}
+            initial={{ x: rtl ? "-100%" : "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            exit={{ x: rtl ? "-100%" : "100%" }}
             transition={{ type: "spring", stiffness: 320, damping: 32 }}
-            className="fixed top-0 right-0 z-50 h-[100dvh] w-full sm:w-[440px] glass-panel border-l shadow-2xl flex flex-col"
+            className={`fixed top-0 z-50 h-[100dvh] w-full sm:w-[440px] glass-panel shadow-2xl flex flex-col ${
+              rtl ? "left-0 border-r" : "right-0 border-l"
+            }`}
           >
             <div className="flex items-center justify-between px-6 h-14 border-b shrink-0">
               <div className="flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-muted-foreground font-medium">
-                <KeyRound className="w-3.5 h-3.5" /> Active rental
+                <KeyRound className="w-3.5 h-3.5" /> {t("renter.activeRental")}
               </div>
               <Button
                 size="icon"
@@ -74,23 +80,21 @@ export function RenterProfileDrawer({ car, onClose }: Props) {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
-              {/* Vehicle banner */}
               <div className="space-y-1">
                 <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
-                  Vehicle
+                  {t("renter.vehicle")}
                 </div>
                 <div className="text-base font-semibold">
                   {car.brand} {car.model}
                 </div>
-                <div className="text-xs text-muted-foreground tabular-nums">
+                <div className="text-xs text-muted-foreground tabular-nums font-mono">
                   {car.plate} · {car.year} · {car.currentKm.toLocaleString()} km
                 </div>
               </div>
 
-              {/* Renter profile */}
               <div className="card-glass rounded-2xl p-6 space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full border border-white/10 bg-gradient-to-br from-primary/30 to-primary/5 flex items-center justify-center text-base font-medium tracking-wide">
+                  <div className="w-14 h-14 rounded-full border border-white/10 bg-gradient-to-br from-primary/30 to-primary/5 flex items-center justify-center text-base font-medium tracking-wide shrink-0">
                     {initials(car.currentRental.renter.name)}
                   </div>
                   <div className="min-w-0">
@@ -109,58 +113,58 @@ export function RenterProfileDrawer({ car, onClose }: Props) {
                 />
               </div>
 
-              {/* Rental info */}
               <div className="space-y-3">
                 <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
-                  Rental
+                  {t("renter.rental")}
                 </div>
                 <div className="card-glass rounded-xl p-4 grid grid-cols-2 gap-4">
                   <InfoRow
                     icon={CalendarDays}
-                    label="Start"
+                    label={t("renter.start")}
                     value={format(
                       new Date(car.currentRental.startDate),
-                      "MMM d, yyyy",
+                      "PPP",
+                      { locale: dateFnsLocale },
                     )}
                   />
                   <InfoRow
                     icon={CalendarDays}
-                    label="End"
+                    label={t("renter.end")}
                     value={format(
                       new Date(car.currentRental.endDate),
-                      "MMM d, yyyy",
+                      "PPP",
+                      { locale: dateFnsLocale },
                     )}
                   />
                   <InfoRow
                     icon={Phone}
-                    label="Contact"
+                    label={t("renter.contact")}
                     value="—"
                     mono
                   />
                   <InfoRow
                     icon={KeyRound}
-                    label="Rental ID"
+                    label={t("renter.rentalId")}
                     value={car.currentRental.id.slice(-8)}
                     mono
                   />
                 </div>
               </div>
 
-              {/* Documents */}
               <div className="space-y-3">
                 <div className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
-                  Documents
+                  {t("renter.documents")}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <DocCard
                     icon={IdCard}
-                    label="ID Card"
-                    sub="Scanned · verified"
+                    label={t("renter.idCard")}
+                    sub={t("renter.idCardSub")}
                   />
                   <DocCard
                     icon={FileText}
-                    label="Contract"
-                    sub="Signed · April 22"
+                    label={t("renter.contract")}
+                    sub={t("renter.contractSub")}
                   />
                 </div>
               </div>
@@ -175,7 +179,8 @@ export function RenterProfileDrawer({ car, onClose }: Props) {
                   onClose();
                 }}
               >
-                <CornerDownLeft className="w-4 h-4" /> Mark as returned
+                <CornerDownLeft className="w-4 h-4 rtl:rotate-180" />{" "}
+                {t("fleet.markReturned")}
               </Button>
             </div>
           </motion.aside>
@@ -192,6 +197,8 @@ function TimeRemainingBar({
   startDate: string;
   endDate: string;
 }) {
+  const { t } = useTranslation();
+  const { dateFnsLocale } = useLocale();
   const start = new Date(startDate);
   const end = new Date(endDate);
   const now = new Date();
@@ -202,9 +209,12 @@ function TimeRemainingBar({
   const hours = differenceInHours(end, now);
   const days = differenceInDays(end, now);
 
-  let label = "overdue";
+  let label = t("renter.overdue");
   if (hours > 0) {
-    label = days > 0 ? `${days} days left` : `${hours} hours left`;
+    label =
+      days > 0
+        ? t("renter.daysLeft", { count: days })
+        : t("renter.hoursLeft", { count: hours });
   }
 
   const isOverdue = hours <= 0;
@@ -213,7 +223,7 @@ function TimeRemainingBar({
     <div className="space-y-2">
       <div className="flex items-baseline justify-between text-xs">
         <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] font-medium">
-          Time remaining
+          {t("renter.timeRemaining")}
         </span>
         <span
           className={`tabular-nums font-medium ${
@@ -223,7 +233,7 @@ function TimeRemainingBar({
           {label}
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden">
+      <div className="h-1.5 rounded-full bg-muted/60 overflow-hidden" dir="ltr">
         <motion.div
           initial={{ width: "100%" }}
           animate={{ width: `${remaining}%` }}
@@ -238,8 +248,8 @@ function TimeRemainingBar({
         />
       </div>
       <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums">
-        <span>{format(start, "MMM d")}</span>
-        <span>{format(end, "MMM d")}</span>
+        <span>{format(start, "MMM d", { locale: dateFnsLocale })}</span>
+        <span>{format(end, "MMM d", { locale: dateFnsLocale })}</span>
       </div>
     </div>
   );
@@ -262,9 +272,7 @@ function InfoRow({
         <Icon className="w-3 h-3" />
         {label}
       </div>
-      <div
-        className={`text-sm ${mono ? "font-mono tabular-nums" : ""}`}
-      >
+      <div className={`text-sm ${mono ? "font-mono tabular-nums" : ""}`}>
         {value}
       </div>
     </div>
@@ -283,7 +291,7 @@ function DocCard({
   return (
     <button
       type="button"
-      className="card-glass rounded-xl p-4 text-left hover:border-foreground/20 transition-colors group"
+      className="card-glass rounded-xl p-4 text-start hover:border-foreground/20 transition-colors group"
     >
       <div className="w-9 h-9 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mb-3 group-hover:bg-primary/15 transition-colors">
         <Icon className="w-4 h-4 text-primary" />

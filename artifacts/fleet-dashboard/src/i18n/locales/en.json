@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "overview": "Overview",
+    "timeline": "Timeline"
+  },
+  "header": {
+    "addVehicle": "Add vehicle",
+    "alerts": "Alerts",
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "page": {
+    "commandCenter": "Command Center",
+    "masterTimeline": "Master Timeline",
+    "subtitleOverview": "manage your vehicles, rentals, and maintenance.",
+    "subtitleTimeline": "Drag horizontally to scroll through the calendar. Click a rental to inspect the renter."
+  },
+  "stats": {
+    "totalFleet": "Total Fleet",
+    "available": "Available",
+    "onRent": "On Rent",
+    "alerts": "Alerts",
+    "density": "7-day density"
+  },
+  "fleet": {
+    "title": "Fleet",
+    "filter": "Filter vehicles...",
+    "empty": "No vehicles match your search.",
+    "rentOut": "Rent out",
+    "return": "Return",
+    "markReturned": "Mark as returned"
+  },
+  "status": {
+    "Available": "Available",
+    "Rented": "Rented",
+    "Maintenance": "Maintenance"
+  },
+  "maintenance": {
+    "title": "Maintenance Pulse",
+    "atRisk": "{{count}} at risk",
+    "tires": "Tires",
+    "oil": "Oil",
+    "insurance": "Insurance",
+    "healthy": "healthy",
+    "warning": "warning",
+    "critical": "critical",
+    "allHealthy": "All vehicles within healthy thresholds.",
+    "kmLeft": "{{km}} km left",
+    "kmOver": "{{km}} km over",
+    "daysLeft": "{{count}} d left",
+    "daysOverdue": "{{count}} d overdue",
+    "dueToday": "due today",
+    "expiresToday": "expires today",
+    "daysExpired": "{{count}} d expired",
+    "inDays": "in {{count}} d"
+  },
+  "timeline": {
+    "vehicle": "Vehicle",
+    "active": "Active rental",
+    "today": "Today",
+    "weekend": "Weekend",
+    "subtitle": "Click any rental to see the renter's profile."
+  },
+  "renter": {
+    "activeRental": "Active rental",
+    "vehicle": "Vehicle",
+    "rental": "Rental",
+    "documents": "Documents",
+    "start": "Start",
+    "end": "End",
+    "contact": "Contact",
+    "rentalId": "Rental ID",
+    "idCard": "ID Card",
+    "contract": "Contract",
+    "idCardSub": "Scanned · verified",
+    "contractSub": "Signed",
+    "timeRemaining": "Time remaining",
+    "daysLeft": "{{count}} days left",
+    "hoursLeft": "{{count}} hours left",
+    "overdue": "overdue"
+  },
+  "addCar": {
+    "title": "Add vehicle",
+    "description": "Enter details and maintenance thresholds for the new car.",
+    "vehicleDetails": "Vehicle details",
+    "thresholds": "Maintenance thresholds",
+    "plate": "Plate",
+    "year": "Year",
+    "brand": "Brand",
+    "model": "Model",
+    "currentKm": "Current km",
+    "oilChangeKm": "Oil change at km",
+    "tireChangeDate": "Tire change date",
+    "insuranceDate": "Insurance expiry",
+    "save": "Save vehicle",
+    "added": "Vehicle added",
+    "addedDescription": "{{brand}} {{model}} added to the fleet.",
+    "errors": {
+      "plate": "Plate is required",
+      "brand": "Brand is required",
+      "model": "Model is required",
+      "required": "Required"
+    }
+  },
+  "rentDialog": {
+    "title": "Rent out vehicle",
+    "renterName": "Renter name",
+    "idNumber": "ID number",
+    "rentalPeriod": "Rental period",
+    "pickRange": "Pick a date range",
+    "idCardScan": "ID card scan",
+    "uploadCta": "Scan or upload ID card",
+    "uploadHint": "JPG, PNG · stays on device",
+    "cancel": "Cancel",
+    "confirm": "Confirm rental",
+    "rentedToast": "Vehicle rented out",
+    "rentedToastBody": "{{brand}} {{model}} returns {{date}}.",
+    "errors": {
+      "name": "Renter name is required.",
+      "id": "Renter ID is required.",
+      "range": "Please pick a start and end date.",
+      "image": "Please upload an image file."
+    }
+  },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Recent events",
+    "empty": "No activity yet.",
+    "added": "Vehicle added",
+    "rented": "Vehicle rented",
+    "returned": "Vehicle returned",
+    "alertSuffix": "alert",
+    "addedDetail": "{{brand}} {{model}} ({{plate}}) joined the fleet",
+    "rentedDetail": "{{brand}} {{model}} rented by {{name}} ({{id}})",
+    "returnedDetail": "{{brand}} {{model}} ({{plate}}) is back in the fleet",
+    "alertDetail": "{{brand}} {{model}} ({{plate}}) — {{detail}}"
+  },
+  "upcomingReturns": "Upcoming returns",
+  "noActiveRentals": "No active rentals.",
+  "common": {
+    "in": "in {{value}}",
+    "overdue": "overdue"
+  }
+}

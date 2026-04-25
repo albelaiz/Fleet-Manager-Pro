@@ -4,10 +4,14 @@ import { Car } from "../data/types";
 export type Severity = "healthy" | "warning" | "critical";
 
 export interface HealthMetric {
-  label: string;
-  detail: string;
-  severity: Severity;
   type: "oil" | "tire" | "insurance";
+  severity: Severity;
+  /** i18n key for the label, e.g. "maintenance.tires" */
+  labelKey: string;
+  /** i18n key for the formatted detail, e.g. "maintenance.daysLeft" */
+  detailKey: string;
+  /** Interpolation params for the detail key */
+  detailParams: Record<string, number | string>;
 }
 
 export function getTireHealth(car: Car, now: Date = new Date()): HealthMetric {
@@ -18,14 +22,24 @@ export function getTireHealth(car: Car, now: Date = new Date()): HealthMetric {
   if (days < 7) severity = "critical";
   else if (days <= 30) severity = "warning";
 
-  const detail =
-    days < 0
-      ? `${Math.abs(days)}d overdue`
-      : days === 0
-        ? "due today"
-        : `in ${days}d`;
+  let detailKey = "maintenance.inDays";
+  let detailParams: Record<string, number | string> = { count: days };
 
-  return { label: "Tires", detail, severity, type: "tire" };
+  if (days < 0) {
+    detailKey = "maintenance.daysOverdue";
+    detailParams = { count: Math.abs(days) };
+  } else if (days === 0) {
+    detailKey = "maintenance.dueToday";
+    detailParams = {};
+  }
+
+  return {
+    type: "tire",
+    severity,
+    labelKey: "maintenance.tires",
+    detailKey,
+    detailParams,
+  };
 }
 
 export function getOilHealth(car: Car): HealthMetric {
@@ -35,12 +49,19 @@ export function getOilHealth(car: Car): HealthMetric {
   if (remaining <= 0) severity = "critical";
   else if (remaining <= 500) severity = "warning";
 
-  const detail =
-    remaining < 0
-      ? `${Math.abs(remaining).toLocaleString()} km over`
-      : `${remaining.toLocaleString()} km left`;
+  const detailKey =
+    remaining < 0 ? "maintenance.kmOver" : "maintenance.kmLeft";
+  const detailParams = {
+    km: Math.abs(remaining).toLocaleString(),
+  };
 
-  return { label: "Oil", detail, severity, type: "oil" };
+  return {
+    type: "oil",
+    severity,
+    labelKey: "maintenance.oil",
+    detailKey,
+    detailParams,
+  };
 }
 
 export function getInsuranceHealth(
@@ -54,14 +75,24 @@ export function getInsuranceHealth(
   if (days < 7) severity = "critical";
   else if (days <= 30) severity = "warning";
 
-  const detail =
-    days < 0
-      ? `${Math.abs(days)}d expired`
-      : days === 0
-        ? "expires today"
-        : `${days}d left`;
+  let detailKey = "maintenance.daysLeft";
+  let detailParams: Record<string, number | string> = { count: days };
 
-  return { label: "Insurance", detail, severity, type: "insurance" };
+  if (days < 0) {
+    detailKey = "maintenance.daysExpired";
+    detailParams = { count: Math.abs(days) };
+  } else if (days === 0) {
+    detailKey = "maintenance.expiresToday";
+    detailParams = {};
+  }
+
+  return {
+    type: "insurance",
+    severity,
+    labelKey: "maintenance.insurance",
+    detailKey,
+    detailParams,
+  };
 }
 
 export function getCarHealth(car: Car, now: Date = new Date()) {

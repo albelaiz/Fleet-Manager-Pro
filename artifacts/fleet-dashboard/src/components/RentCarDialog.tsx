@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -33,8 +34,11 @@ import { useCars } from "../context/CarsContext";
 import { useToast } from "../hooks/use-toast";
 import type { Car } from "../data/types";
 import { cn } from "../lib/utils";
+import { useLocale } from "../hooks/useLocale";
 
 export function RentCarDialog({ car }: { car: Car }) {
+  const { t } = useTranslation();
+  const { dateFnsLocale } = useLocale();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [renterId, setRenterId] = useState("");
@@ -56,7 +60,7 @@ export function RentCarDialog({ car }: { car: Car }) {
   const handleFile = (file: File | undefined) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file.");
+      setError(t("rentDialog.errors.image"));
       return;
     }
     const reader = new FileReader();
@@ -68,10 +72,10 @@ export function RentCarDialog({ car }: { car: Car }) {
     e.preventDefault();
     setError(null);
 
-    if (!name.trim()) return setError("Renter name is required.");
-    if (!renterId.trim()) return setError("Renter ID is required.");
+    if (!name.trim()) return setError(t("rentDialog.errors.name"));
+    if (!renterId.trim()) return setError(t("rentDialog.errors.id"));
     if (!range?.from || !range?.to)
-      return setError("Please pick a start and end date.");
+      return setError(t("rentDialog.errors.range"));
 
     rentCar(car.id, {
       renterName: name.trim(),
@@ -82,8 +86,12 @@ export function RentCarDialog({ car }: { car: Car }) {
     });
 
     toast({
-      title: "Vehicle rented out",
-      description: `${car.brand} ${car.model} returns ${format(range.to, "MMM d")}.`,
+      title: t("rentDialog.rentedToast"),
+      description: t("rentDialog.rentedToastBody", {
+        brand: car.brand,
+        model: car.model,
+        date: format(range.to, "PP", { locale: dateFnsLocale }),
+      }),
     });
 
     setOpen(false);
@@ -100,7 +108,7 @@ export function RentCarDialog({ car }: { car: Car }) {
     >
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs gap-1">
-          <KeyRound className="w-3 h-3" /> Rent out
+          <KeyRound className="w-3 h-3" /> {t("fleet.rentOut")}
         </Button>
       </DialogTrigger>
       <DialogPortal>
@@ -112,7 +120,9 @@ export function RentCarDialog({ car }: { car: Car }) {
             transition={{ type: "spring", stiffness: 360, damping: 28 }}
           >
             <DialogHeader>
-              <DialogTitle className="text-lg">Rent out vehicle</DialogTitle>
+              <DialogTitle className="text-lg">
+                {t("rentDialog.title")}
+              </DialogTitle>
               <DialogDescription>
                 {car.brand} {car.model} · {car.plate}
               </DialogDescription>
@@ -122,32 +132,32 @@ export function RentCarDialog({ car }: { car: Car }) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="renterName" className="text-xs">
-                    Renter name
+                    {t("rentDialog.renterName")}
                   </Label>
                   <Input
                     id="renterName"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Jane Doe"
                     className="h-9"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="renterId" className="text-xs">
-                    ID number
+                    {t("rentDialog.idNumber")}
                   </Label>
                   <Input
                     id="renterId"
                     value={renterId}
                     onChange={(e) => setRenterId(e.target.value)}
-                    placeholder="ID-12345"
                     className="h-9"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs">Rental period</Label>
+                <Label className="text-xs">
+                  {t("rentDialog.rentalPeriod")}
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -158,20 +168,27 @@ export function RentCarDialog({ car }: { car: Car }) {
                         !range && "text-muted-foreground",
                       )}
                     >
-                      <CalendarIcon className="mr-2 w-4 h-4" />
+                      <CalendarIcon className="me-2 w-4 h-4" />
                       {range?.from ? (
                         range.to ? (
                           <span className="tabular-nums">
-                            {format(range.from, "MMM d, yyyy")} →{" "}
-                            {format(range.to, "MMM d, yyyy")}
+                            {format(range.from, "PP", {
+                              locale: dateFnsLocale,
+                            })}{" "}
+                            →{" "}
+                            {format(range.to, "PP", {
+                              locale: dateFnsLocale,
+                            })}
                           </span>
                         ) : (
                           <span className="tabular-nums">
-                            {format(range.from, "MMM d, yyyy")}
+                            {format(range.from, "PP", {
+                              locale: dateFnsLocale,
+                            })}
                           </span>
                         )
                       ) : (
-                        <span>Pick a date range</span>
+                        <span>{t("rentDialog.pickRange")}</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -182,6 +199,7 @@ export function RentCarDialog({ car }: { car: Car }) {
                       onSelect={setRange}
                       numberOfMonths={2}
                       defaultMonth={range?.from ?? new Date()}
+                      locale={dateFnsLocale}
                     />
                   </PopoverContent>
                 </Popover>
@@ -189,7 +207,8 @@ export function RentCarDialog({ car }: { car: Car }) {
 
               <div className="space-y-1.5">
                 <Label className="text-xs flex items-center gap-1.5">
-                  <ScanLine className="w-3.5 h-3.5" /> ID card scan
+                  <ScanLine className="w-3.5 h-3.5" />{" "}
+                  {t("rentDialog.idCardScan")}
                 </Label>
                 <input
                   ref={fileRef}
@@ -212,7 +231,7 @@ export function RentCarDialog({ car }: { car: Car }) {
                       size="icon"
                       variant="secondary"
                       onClick={() => setIdPhoto(null)}
-                      className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 end-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <XIcon className="w-3.5 h-3.5" />
                     </Button>
@@ -225,18 +244,16 @@ export function RentCarDialog({ car }: { car: Car }) {
                   >
                     <Upload className="w-4 h-4" />
                     <span className="text-xs font-medium">
-                      Scan or upload ID card
+                      {t("rentDialog.uploadCta")}
                     </span>
                     <span className="text-[10px]">
-                      JPG, PNG · stays on device
+                      {t("rentDialog.uploadHint")}
                     </span>
                   </button>
                 )}
               </div>
 
-              {error && (
-                <p className="text-xs text-destructive">{error}</p>
-              )}
+              {error && <p className="text-xs text-destructive">{error}</p>}
 
               <DialogFooter className="gap-2 pt-2">
                 <Button
@@ -244,9 +261,9 @@ export function RentCarDialog({ car }: { car: Car }) {
                   variant="ghost"
                   onClick={() => setOpen(false)}
                 >
-                  Cancel
+                  {t("rentDialog.cancel")}
                 </Button>
-                <Button type="submit">Confirm rental</Button>
+                <Button type="submit">{t("rentDialog.confirm")}</Button>
               </DialogFooter>
             </form>
           </motion.div>

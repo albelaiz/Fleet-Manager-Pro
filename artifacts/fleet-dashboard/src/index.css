@@ -75,7 +75,16 @@
 
   --app-font-sans: 'Geist', 'Inter', sans-serif;
   --app-font-mono: 'Geist Mono', 'JetBrains Mono', Menlo, monospace;
+  --app-font-arabic: 'IBM Plex Sans Arabic', 'Geist', sans-serif;
   --radius: 0.625rem;
+}
+
+html[lang="ar"] {
+  --app-font-sans: 'IBM Plex Sans Arabic', 'Geist', sans-serif;
+}
+html[lang="ar"] body {
+  letter-spacing: 0;
+  font-feature-settings: normal;
 }
 
 .dark {
