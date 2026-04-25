@@ -85,7 +85,7 @@ export function AddCarSheet() {
           <Plus className="w-3.5 h-3.5" /> Add vehicle
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto pr-0">
+      <SheetContent className="w-full sm:max-w-md overflow-y-auto pr-0 glass-panel !bg-transparent border-l shadow-2xl">
         <div className="pr-6">
           <SheetHeader className="mb-6">
             <SheetTitle className="text-xl">Add vehicle</SheetTitle>

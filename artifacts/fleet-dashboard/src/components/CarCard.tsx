@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Car } from "../data/types";
 import { getCarHealth, type HealthMetric } from "../lib/maintenance";
 import { format, differenceInHours } from "date-fns";
@@ -12,14 +13,9 @@ function HealthDot({ metric }: { metric: HealthMetric }) {
   const isWarning = metric.severity === "warning";
 
   let dotColor = "bg-emerald-500";
-  let pingColor = "bg-emerald-400";
-  if (isCritical) {
-    dotColor = "bg-red-500";
-    pingColor = "bg-red-400";
-  } else if (isWarning) {
-    dotColor = "bg-amber-500";
-    pingColor = "bg-amber-400";
-  }
+  let pingColor = "bg-red-400";
+  if (isCritical) dotColor = "bg-red-500";
+  else if (isWarning) dotColor = "bg-amber-500";
 
   return (
     <div
@@ -29,8 +25,7 @@ function HealthDot({ metric }: { metric: HealthMetric }) {
       <span className="relative flex h-1.5 w-1.5">
         {isCritical && (
           <span
-            className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-60 ${pingColor}`}
-            style={{ animationDuration: "1.8s" }}
+            className={`animate-soft-pulse absolute inline-flex h-full w-full rounded-full ${pingColor}`}
           />
         )}
         <span
@@ -61,7 +56,7 @@ function formatCountdown(endDate: string, now: Date) {
   return `in ${h}h`;
 }
 
-export function CarCard({ car }: { car: Car }) {
+export function CarCard({ car, index = 0 }: { car: Car; index?: number }) {
   const now = useNow();
   const health = getCarHealth(car, now);
   const { returnCar } = useCars();
@@ -73,8 +68,22 @@ export function CarCard({ car }: { car: Car }) {
   if (car.status === "Rented") statusDot = "bg-primary";
   else if (car.status === "Maintenance") statusDot = "bg-amber-500";
 
+  const isCritical = health.overallSeverity === "critical";
+
   return (
-    <div className="flex flex-col overflow-hidden bg-card border rounded-xl shadow-sm hover:border-foreground/20 transition-colors duration-150">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.45,
+        delay: index * 0.04,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      whileHover={{ y: -3 }}
+      className={`flex flex-col overflow-hidden bg-card border rounded-xl shadow-sm transition-shadow duration-200 hover:shadow-md ${
+        isCritical ? "animate-alert-glow" : ""
+      }`}
+    >
       <div className="p-5 pb-4">
         <div className="flex justify-between items-start mb-1 gap-3">
           <h3 className="font-semibold text-base">
@@ -132,6 +141,6 @@ export function CarCard({ car }: { car: Car }) {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

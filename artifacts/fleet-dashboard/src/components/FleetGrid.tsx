@@ -42,9 +42,9 @@ export function FleetGrid() {
           No vehicles match your search.
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 animate-in fade-in duration-300">
-          {filtered.map((car) => (
-            <CarCard key={car.id} car={car} />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          {filtered.map((car, i) => (
+            <CarCard key={car.id} car={car} index={i} />
           ))}
         </div>
       )}
