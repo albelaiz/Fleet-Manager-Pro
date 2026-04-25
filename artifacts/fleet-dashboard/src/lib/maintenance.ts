@@ -5,79 +5,78 @@ export type Severity = "healthy" | "warning" | "critical";
 
 export interface HealthMetric {
   label: string;
-  value: string | number;
+  detail: string;
   severity: Severity;
   type: "oil" | "tire" | "insurance";
 }
 
-const TIRE_LIFESPAN_DAYS = 365 * 3; // roughly 3 years
-
-export function getTireHealth(car: Car, currentDate: Date = new Date("2026-04-25T12:00:00Z")): HealthMetric {
-  const lastChange = new Date(car.maintenance.lastTireChangeDate);
-  const daysSinceChange = differenceInDays(currentDate, lastChange);
-  const daysRemaining = TIRE_LIFESPAN_DAYS - daysSinceChange;
+export function getTireHealth(car: Car, now: Date = new Date()): HealthMetric {
+  const target = new Date(car.tireChangeDate);
+  const days = differenceInDays(target, now);
 
   let severity: Severity = "healthy";
-  if (daysRemaining <= 30 && daysRemaining > 7) severity = "warning";
-  if (daysRemaining <= 7) severity = "critical";
+  if (days < 7) severity = "critical";
+  else if (days <= 30) severity = "warning";
 
-  return {
-    label: "Tires",
-    value: `${daysRemaining > 0 ? daysRemaining : 0} days`,
-    severity,
-    type: "tire"
-  };
+  const detail =
+    days < 0
+      ? `${Math.abs(days)}d overdue`
+      : days === 0
+        ? "due today"
+        : `in ${days}d`;
+
+  return { label: "Tires", detail, severity, type: "tire" };
 }
 
 export function getOilHealth(car: Car): HealthMetric {
-  const kmSinceChange = car.currentKm - car.maintenance.lastOilChangeKm;
-  const kmRemaining = car.maintenance.oilChangeIntervalKm - kmSinceChange;
+  const remaining = car.oilChangeKm - car.currentKm;
 
   let severity: Severity = "healthy";
-  if (kmRemaining <= 1000 && kmRemaining > 200) severity = "warning";
-  if (kmRemaining <= 200) severity = "critical";
+  if (remaining <= 0) severity = "critical";
+  else if (remaining <= 500) severity = "warning";
 
-  return {
-    label: "Oil",
-    value: `${kmRemaining > 0 ? kmRemaining : 0} km`,
-    severity,
-    type: "oil"
-  };
+  const detail =
+    remaining < 0
+      ? `${Math.abs(remaining).toLocaleString()} km over`
+      : `${remaining.toLocaleString()} km left`;
+
+  return { label: "Oil", detail, severity, type: "oil" };
 }
 
-export function getInsuranceHealth(car: Car, currentDate: Date = new Date("2026-04-25T12:00:00Z")): HealthMetric {
-  const expiry = new Date(car.maintenance.insuranceExpiryDate);
-  const daysRemaining = differenceInDays(expiry, currentDate);
+export function getInsuranceHealth(
+  car: Car,
+  now: Date = new Date(),
+): HealthMetric {
+  const expiry = new Date(car.insuranceDate);
+  const days = differenceInDays(expiry, now);
 
   let severity: Severity = "healthy";
-  if (daysRemaining <= 30 && daysRemaining > 7) severity = "warning";
-  if (daysRemaining <= 7) severity = "critical";
+  if (days < 7) severity = "critical";
+  else if (days <= 30) severity = "warning";
 
-  return {
-    label: "Insurance",
-    value: `${daysRemaining > 0 ? daysRemaining : 0} days`,
-    severity,
-    type: "insurance"
-  };
+  const detail =
+    days < 0
+      ? `${Math.abs(days)}d expired`
+      : days === 0
+        ? "expires today"
+        : `${days}d left`;
+
+  return { label: "Insurance", detail, severity, type: "insurance" };
 }
 
-export function getCarHealthScore(car: Car, currentDate: Date = new Date("2026-04-25T12:00:00Z")): { score: number, metrics: HealthMetric[], overallSeverity: Severity } {
+export function getCarHealth(car: Car, now: Date = new Date()) {
   const metrics = [
-    getTireHealth(car, currentDate),
+    getTireHealth(car, now),
     getOilHealth(car),
-    getInsuranceHealth(car, currentDate)
+    getInsuranceHealth(car, now),
   ];
 
-  const criticalCount = metrics.filter(m => m.severity === "critical").length;
-  const warningCount = metrics.filter(m => m.severity === "warning").length;
+  const criticalCount = metrics.filter((m) => m.severity === "critical").length;
+  const warningCount = metrics.filter((m) => m.severity === "warning").length;
 
   let overallSeverity: Severity = "healthy";
   if (warningCount > 0) overallSeverity = "warning";
   if (criticalCount > 0) overallSeverity = "critical";
 
-  // Dummy score calculation
-  let score = 100 - (criticalCount * 30) - (warningCount * 10);
-  if (score < 0) score = 0;
-
-  return { score, metrics, overallSeverity };
+  return { metrics, overallSeverity, criticalCount, warningCount };
 }

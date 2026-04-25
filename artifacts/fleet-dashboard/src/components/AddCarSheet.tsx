@@ -1,34 +1,49 @@
-import React, { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from "./ui/sheet";
+import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetDescription,
+  SheetFooter,
+} from "./ui/sheet";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Car } from "../data/types";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { useCars } from "../context/CarsContext";
 import { useToast } from "../hooks/use-toast";
 import { Separator } from "./ui/separator";
 
 const formSchema = z.object({
   plate: z.string().min(2, "Plate is required"),
-  brand: z.string().min(2, "Brand is required"),
-  model: z.string().min(2, "Model is required"),
+  brand: z.string().min(1, "Brand is required"),
+  model: z.string().min(1, "Model is required"),
   year: z.coerce.number().min(1990).max(2030),
   currentKm: z.coerce.number().min(0),
-  lastOilChangeKm: z.coerce.number().min(0),
-  oilChangeIntervalKm: z.coerce.number().min(1000).default(10000),
-  lastTireChangeDate: z.string(),
-  insuranceExpiryDate: z.string(),
+  oilChangeKm: z.coerce.number().min(0),
+  tireChangeDate: z.string().min(1, "Required"),
+  insuranceDate: z.string().min(1, "Required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
+export function AddCarSheet() {
   const [open, setOpen] = useState(false);
+  const { addCar } = useCars();
   const { toast } = useToast();
-  
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,36 +52,29 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
       model: "",
       year: new Date().getFullYear(),
       currentKm: 0,
-      lastOilChangeKm: 0,
-      oilChangeIntervalKm: 10000,
-      lastTireChangeDate: new Date().toISOString().split("T")[0],
-      insuranceExpiryDate: new Date().toISOString().split("T")[0],
-    }
+      oilChangeKm: 10000,
+      tireChangeDate: "",
+      insuranceDate: "",
+    },
   });
 
   const onSubmit = (data: FormValues) => {
-    const newCar: Car = {
-      id: `car-${Date.now()}`,
-      plate: data.plate,
+    addCar({
+      plate: data.plate.toUpperCase(),
       brand: data.brand,
       model: data.model,
       year: data.year,
       currentKm: data.currentKm,
-      status: "Available",
-      maintenance: {
-        lastOilChangeKm: data.lastOilChangeKm,
-        oilChangeIntervalKm: data.oilChangeIntervalKm,
-        lastTireChangeDate: new Date(data.lastTireChangeDate).toISOString(),
-        insuranceExpiryDate: new Date(data.insuranceExpiryDate).toISOString(),
-      }
-    };
-    
-    onAdd(newCar);
+      oilChangeKm: data.oilChangeKm,
+      tireChangeDate: new Date(data.tireChangeDate).toISOString(),
+      insuranceDate: new Date(data.insuranceDate).toISOString(),
+    });
+
     setOpen(false);
     form.reset();
     toast({
       title: "Vehicle added",
-      description: `${newCar.brand} ${newCar.model} has been added to the fleet.`,
+      description: `${data.brand} ${data.model} added to the fleet.`,
     });
   };
 
@@ -77,28 +85,37 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
           <Plus className="w-3.5 h-3.5" /> Add vehicle
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto border-l sm:border-l sm:rounded-l-2xl pr-0">
+      <SheetContent className="w-full sm:max-w-md overflow-y-auto pr-0">
         <div className="pr-6">
           <SheetHeader className="mb-6">
             <SheetTitle className="text-xl">Add vehicle</SheetTitle>
             <SheetDescription>
-              Enter the details for the new car.
+              Enter details and maintenance thresholds for the new car.
             </SheetDescription>
           </SheetHeader>
-          
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
+            >
               <div className="space-y-4">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Vehicle details</h4>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Vehicle details
+                </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="plate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Plate Number</FormLabel>
+                        <FormLabel className="text-xs">Plate</FormLabel>
                         <FormControl>
-                          <Input placeholder="XYZ-123" {...field} className="h-9" />
+                          <Input
+                            placeholder="XYZ-123"
+                            {...field}
+                            className="h-9"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -126,7 +143,11 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
                       <FormItem>
                         <FormLabel className="text-xs">Brand</FormLabel>
                         <FormControl>
-                          <Input placeholder="Toyota" {...field} className="h-9" />
+                          <Input
+                            placeholder="Toyota"
+                            {...field}
+                            className="h-9"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -139,7 +160,11 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
                       <FormItem>
                         <FormLabel className="text-xs">Model</FormLabel>
                         <FormControl>
-                          <Input placeholder="Corolla" {...field} className="h-9" />
+                          <Input
+                            placeholder="Corolla"
+                            {...field}
+                            className="h-9"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -151,27 +176,18 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
               <Separator />
 
               <div className="space-y-4">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Maintenance schedule</h4>
-                <FormField
-                  control={form.control}
-                  name="currentKm"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs">Current Odometer (km)</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} className="h-9" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Maintenance thresholds
+                </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="lastOilChangeKm"
+                    name="currentKm"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Last Oil Change (km)</FormLabel>
+                        <FormLabel className="text-xs">
+                          Current km
+                        </FormLabel>
                         <FormControl>
                           <Input type="number" {...field} className="h-9" />
                         </FormControl>
@@ -181,10 +197,12 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
                   />
                   <FormField
                     control={form.control}
-                    name="oilChangeIntervalKm"
+                    name="oilChangeKm"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Oil Interval (km)</FormLabel>
+                        <FormLabel className="text-xs">
+                          Oil change at km
+                        </FormLabel>
                         <FormControl>
                           <Input type="number" {...field} className="h-9" />
                         </FormControl>
@@ -196,10 +214,12 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="lastTireChangeDate"
+                    name="tireChangeDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Last Tire Change</FormLabel>
+                        <FormLabel className="text-xs">
+                          Tire change date
+                        </FormLabel>
                         <FormControl>
                           <Input type="date" {...field} className="h-9" />
                         </FormControl>
@@ -209,10 +229,12 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
                   />
                   <FormField
                     control={form.control}
-                    name="insuranceExpiryDate"
+                    name="insuranceDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Insurance Expiry</FormLabel>
+                        <FormLabel className="text-xs">
+                          Insurance expiry
+                        </FormLabel>
                         <FormControl>
                           <Input type="date" {...field} className="h-9" />
                         </FormControl>
@@ -222,9 +244,11 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
                   />
                 </div>
               </div>
-              
+
               <SheetFooter className="mt-8">
-                <Button type="submit" className="w-full">Save vehicle</Button>
+                <Button type="submit" className="w-full">
+                  Save vehicle
+                </Button>
               </SheetFooter>
             </form>
           </Form>

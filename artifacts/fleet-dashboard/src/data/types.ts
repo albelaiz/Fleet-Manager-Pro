@@ -3,21 +3,13 @@ export type CarStatus = "Available" | "Rented" | "Maintenance";
 export interface Renter {
   id: string;
   name: string;
-  phone: string;
 }
 
 export interface Rental {
   id: string;
   renter: Renter;
-  startDate: string; // ISO string
-  endDate: string; // ISO string
-}
-
-export interface MaintenanceStatus {
-  lastOilChangeKm: number;
-  oilChangeIntervalKm: number;
-  lastTireChangeDate: string; // ISO string
-  insuranceExpiryDate: string; // ISO string
+  startDate: string;
+  endDate: string;
 }
 
 export interface Car {
@@ -27,8 +19,9 @@ export interface Car {
   model: string;
   year: number;
   currentKm: number;
+  oilChangeKm: number;
+  tireChangeDate: string;
+  insuranceDate: string;
   status: CarStatus;
   currentRental?: Rental;
-  maintenance: MaintenanceStatus;
-  imageUrl?: string;
 }

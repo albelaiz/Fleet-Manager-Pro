@@ -8,19 +8,16 @@ export const mockCars: Car[] = [
     model: "Model 3",
     year: 2023,
     currentKm: 45000,
+    oilChangeKm: 65000,
+    tireChangeDate: "2027-01-15T00:00:00Z",
+    insuranceDate: "2026-11-01T00:00:00Z",
     status: "Rented",
     currentRental: {
       id: "rent-1",
-      renter: { id: "u-1", name: "Alice Johnson", phone: "555-0101" },
+      renter: { id: "ID-7821", name: "Alice Johnson" },
       startDate: "2026-04-22T08:00:00Z",
-      endDate: "2026-04-28T18:00:00Z"
+      endDate: "2026-04-28T18:00:00Z",
     },
-    maintenance: {
-      lastOilChangeKm: 45000, // EV, no oil, but using as general maintenance metric
-      oilChangeIntervalKm: 20000,
-      lastTireChangeDate: "2024-01-15T00:00:00Z",
-      insuranceExpiryDate: "2026-11-01T00:00:00Z"
-    }
   },
   {
     id: "car-2",
@@ -29,13 +26,10 @@ export const mockCars: Car[] = [
     model: "X5",
     year: 2021,
     currentKm: 85200,
+    oilChangeKm: 85500,
+    tireChangeDate: "2026-05-10T00:00:00Z",
+    insuranceDate: "2026-05-02T00:00:00Z",
     status: "Available",
-    maintenance: {
-      lastOilChangeKm: 78000,
-      oilChangeIntervalKm: 10000, // approaching warning
-      lastTireChangeDate: "2023-05-10T00:00:00Z",
-      insuranceExpiryDate: "2026-05-02T00:00:00Z" // critical
-    }
   },
   {
     id: "car-3",
@@ -44,13 +38,10 @@ export const mockCars: Car[] = [
     model: "Corolla",
     year: 2020,
     currentKm: 112000,
+    oilChangeKm: 115000,
+    tireChangeDate: "2025-11-20T00:00:00Z",
+    insuranceDate: "2026-08-15T00:00:00Z",
     status: "Maintenance",
-    maintenance: {
-      lastOilChangeKm: 111800,
-      oilChangeIntervalKm: 15000,
-      lastTireChangeDate: "2022-11-20T00:00:00Z",
-      insuranceExpiryDate: "2026-08-15T00:00:00Z"
-    }
   },
   {
     id: "car-4",
@@ -59,19 +50,16 @@ export const mockCars: Car[] = [
     model: "Clio",
     year: 2022,
     currentKm: 32000,
+    oilChangeKm: 40000,
+    tireChangeDate: "2026-09-10T00:00:00Z",
+    insuranceDate: "2027-01-10T00:00:00Z",
     status: "Rented",
     currentRental: {
       id: "rent-2",
-      renter: { id: "u-2", name: "Bob Smith", phone: "555-0102" },
+      renter: { id: "ID-3309", name: "Bob Smith" },
       startDate: "2026-04-24T10:00:00Z",
-      endDate: "2026-04-26T10:00:00Z" // returns soon
+      endDate: "2026-04-26T10:00:00Z",
     },
-    maintenance: {
-      lastOilChangeKm: 25000,
-      oilChangeIntervalKm: 10000,
-      lastTireChangeDate: "2025-02-10T00:00:00Z",
-      insuranceExpiryDate: "2027-01-10T00:00:00Z"
-    }
   },
   {
     id: "car-5",
@@ -80,13 +68,10 @@ export const mockCars: Car[] = [
     model: "A4",
     year: 2024,
     currentKm: 15000,
+    oilChangeKm: 25000,
+    tireChangeDate: "2027-03-01T00:00:00Z",
+    insuranceDate: "2026-04-30T00:00:00Z",
     status: "Available",
-    maintenance: {
-      lastOilChangeKm: 14000,
-      oilChangeIntervalKm: 15000,
-      lastTireChangeDate: "2024-03-01T00:00:00Z",
-      insuranceExpiryDate: "2026-04-30T00:00:00Z" // warning
-    }
   },
   {
     id: "car-6",
@@ -95,12 +80,9 @@ export const mockCars: Car[] = [
     model: "C-Class",
     year: 2023,
     currentKm: 41000,
+    oilChangeKm: 41200,
+    tireChangeDate: "2026-06-15T00:00:00Z",
+    insuranceDate: "2026-10-20T00:00:00Z",
     status: "Available",
-    maintenance: {
-      lastOilChangeKm: 31000, // exact interval, critical
-      oilChangeIntervalKm: 10000,
-      lastTireChangeDate: "2024-06-15T00:00:00Z",
-      insuranceExpiryDate: "2026-10-20T00:00:00Z"
-    }
-  }
+  },
 ];
