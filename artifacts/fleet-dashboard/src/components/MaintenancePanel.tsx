@@ -45,10 +45,7 @@ export function MaintenancePanel() {
     const now = new Date();
     return cars
       .map((car) => ({ car, health: getCarHealth(car, now), now }))
-      .filter(
-        (x) =>
-          x.health.criticalCount > 0 || x.health.warningCount > 0,
-      )
+      .filter((x) => x.health.criticalCount > 0 || x.health.warningCount > 0)
       .sort((a, b) => {
         const sa = severityRank[a.health.overallSeverity];
         const sb = severityRank[b.health.overallSeverity];
@@ -61,16 +58,16 @@ export function MaintenancePanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-          Maintenance HUD
+        <h2 className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          Maintenance Pulse
         </h2>
-        <span className="text-[10px] text-muted-foreground tabular-nums">
+        <span className="text-[10px] text-muted-foreground tabular-nums font-mono">
           {ranked.length} at risk
         </span>
       </div>
 
       {ranked.length === 0 ? (
-        <div className="border rounded-xl p-6 text-center bg-card/60 backdrop-blur">
+        <div className="card-glass rounded-xl p-6 text-center">
           <ShieldAlert className="w-5 h-5 mx-auto text-muted-foreground mb-2" />
           <p className="text-xs text-muted-foreground">
             All vehicles within healthy thresholds.
@@ -82,6 +79,7 @@ export function MaintenancePanel() {
             const tire = health.metrics[0];
             const oil = health.metrics[1];
             const ins = health.metrics[2];
+            const isCritical = health.overallSeverity === "critical";
 
             return (
               <motion.div
@@ -90,29 +88,27 @@ export function MaintenancePanel() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
                   duration: 0.4,
-                  delay: i * 0.05,
+                  delay: i * 0.06,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className={`rounded-xl border bg-card/80 backdrop-blur p-4 shadow-sm ${
-                  health.overallSeverity === "critical"
-                    ? "animate-alert-glow"
-                    : ""
+                className={`card-glass rounded-2xl p-4 ${
+                  isCritical ? "neon-pulse" : ""
                 }`}
               >
-                <div className="flex items-start justify-between mb-3 gap-2">
+                <div className="flex items-start justify-between mb-4 gap-2">
                   <div className="min-w-0">
-                    <div className="font-semibold text-sm truncate">
+                    <div className="font-medium text-sm tracking-tight truncate">
                       {car.brand} {car.model}
                     </div>
-                    <div className="text-[11px] text-muted-foreground tabular-nums">
+                    <div className="text-[11px] text-muted-foreground font-mono tabular-nums">
                       {car.plate}
                     </div>
                   </div>
                   <span
-                    className={`text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded ${
-                      health.overallSeverity === "critical"
-                        ? "bg-red-500/10 text-red-600 dark:text-red-400"
-                        : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                    className={`text-[9px] uppercase tracking-[0.14em] font-semibold px-1.5 py-0.5 rounded ${
+                      isCritical
+                        ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                        : "bg-amber-500/15 text-amber-400 border border-amber-500/30"
                     }`}
                   >
                     {health.overallSeverity}

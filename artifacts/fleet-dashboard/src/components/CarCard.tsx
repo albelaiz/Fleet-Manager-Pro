@@ -6,7 +6,7 @@ import { format, differenceInHours } from "date-fns";
 import { RentCarDialog } from "./RentCarDialog";
 import { Button } from "./ui/button";
 import { useCars } from "../context/CarsContext";
-import { CornerDownLeft } from "lucide-react";
+import { ChevronRight, CornerDownLeft } from "lucide-react";
 
 function HealthDot({ metric }: { metric: HealthMetric }) {
   const isCritical = metric.severity === "critical";
@@ -56,7 +56,13 @@ function formatCountdown(endDate: string, now: Date) {
   return `in ${h}h`;
 }
 
-export function CarCard({ car, index = 0 }: { car: Car; index?: number }) {
+interface Props {
+  car: Car;
+  index?: number;
+  onOpenRenter?: (car: Car) => void;
+}
+
+export function CarCard({ car, index = 0, onOpenRenter }: Props) {
   const now = useNow();
   const health = getCarHealth(car, now);
   const { returnCar } = useCars();
@@ -80,21 +86,21 @@ export function CarCard({ car, index = 0 }: { car: Car; index?: number }) {
         ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ y: -3 }}
-      className={`flex flex-col overflow-hidden bg-card border rounded-xl shadow-sm transition-shadow duration-200 hover:shadow-md ${
-        isCritical ? "animate-alert-glow" : ""
+      className={`card-glass rounded-2xl flex flex-col overflow-hidden transition-shadow duration-200 hover:shadow-2xl ${
+        isCritical ? "neon-pulse" : ""
       }`}
     >
       <div className="p-5 pb-4">
-        <div className="flex justify-between items-start mb-1 gap-3">
-          <h3 className="font-semibold text-base">
+        <div className="flex justify-between items-start mb-1.5 gap-3">
+          <h3 className="font-medium text-base tracking-tight">
             {car.brand} {car.model}
           </h3>
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted border text-xs font-medium whitespace-nowrap">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-background/40 text-[11px] font-medium whitespace-nowrap">
             <span className={`h-1.5 w-1.5 rounded-full ${statusDot}`} />
             {car.status}
           </div>
         </div>
-        <p className="text-sm text-muted-foreground tabular-nums">
+        <p className="text-xs font-mono text-muted-foreground tabular-nums">
           {car.plate} &middot; {car.year} &middot;{" "}
           {car.currentKm.toLocaleString()} km
         </p>
@@ -102,23 +108,25 @@ export function CarCard({ car, index = 0 }: { car: Car; index?: number }) {
 
       <div className="px-5 pb-5 flex-1 flex flex-col gap-4">
         {car.status === "Rented" && car.currentRental && (
-          <div className="bg-muted/50 rounded-md p-3 border text-sm space-y-1">
+          <button
+            type="button"
+            onClick={() => onOpenRenter?.(car)}
+            className="text-left bg-background/30 rounded-lg p-3 border border-white/[0.04] hover:border-white/10 hover:bg-background/50 transition-colors group"
+          >
             <div className="flex justify-between items-center gap-2">
-              <span className="font-medium truncate">
+              <span className="font-medium text-sm truncate">
                 {car.currentRental.renter.name}
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground tabular-nums">
-                {car.currentRental.renter.id}
-              </span>
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
-            <div className="flex justify-between items-center text-xs text-muted-foreground tabular-nums">
+            <div className="flex justify-between items-center text-xs text-muted-foreground tabular-nums font-mono mt-1">
               <span>
                 {format(new Date(car.currentRental.startDate), "MMM d")} →{" "}
-                {format(new Date(car.currentRental.endDate), "MMM d, yyyy")}
+                {format(new Date(car.currentRental.endDate), "MMM d")}
               </span>
               <span className="font-medium text-foreground">{countdown}</span>
             </div>
-          </div>
+          </button>
         )}
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-2">
@@ -136,7 +144,7 @@ export function CarCard({ car, index = 0 }: { car: Car; index?: number }) {
               className="h-7 px-2.5 text-xs gap-1 text-muted-foreground"
               onClick={() => returnCar(car.id)}
             >
-              <CornerDownLeft className="w-3 h-3" /> Mark returned
+              <CornerDownLeft className="w-3 h-3" /> Return
             </Button>
           )}
         </div>

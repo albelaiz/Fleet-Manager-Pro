@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   addMonths,
@@ -10,6 +10,13 @@ import {
 import { useCars } from "../context/CarsContext";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Car } from "../data/types";
+
+interface Props {
+  onOpenRenter?: (car: Car) => void;
+}
+
+const DAY_WIDTH = 44; // px per day - horizontal scroll based
 
 function daysInMonth(date: Date) {
   const start = startOfMonth(date);
@@ -29,41 +36,43 @@ function clampToMonth(date: Date, monthAnchor: Date) {
   return date;
 }
 
-export function TimelineView() {
+export function TimelineView({ onOpenRenter }: Props) {
   const { cars } = useCars();
   const [anchor, setAnchor] = useState(() => new Date());
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const days = useMemo(() => daysInMonth(anchor), [anchor]);
   const today = new Date();
   const monthLabel = format(anchor, "MMMM yyyy");
+  const trackWidth = days.length * DAY_WIDTH;
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Rental Timeline
+          <h2 className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            Master Timeline
           </h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Gantt view of active and upcoming rentals
+            Click any rental to see the renter's profile.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 card-glass rounded-full px-1.5 py-1">
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8"
+            className="h-7 w-7 rounded-full"
             onClick={() => setAnchor((a) => addMonths(a, -1))}
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <div className="text-sm font-medium tabular-nums w-32 text-center">
+          <div className="text-sm font-medium tabular-nums w-32 text-center tracking-tight">
             {monthLabel}
           </div>
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8"
+            className="h-7 w-7 rounded-full"
             onClick={() => setAnchor((a) => addMonths(a, 1))}
           >
             <ChevronRight className="w-4 h-4" />
@@ -71,144 +80,168 @@ export function TimelineView() {
         </div>
       </div>
 
-      <div className="border rounded-xl bg-card/60 backdrop-blur overflow-hidden shadow-sm">
-        {/* Day header */}
-        <div className="flex border-b sticky top-0 bg-card/80 backdrop-blur z-10">
-          <div className="w-44 shrink-0 px-4 py-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium border-r">
-            Vehicle
-          </div>
-          <div className="flex-1 grid" style={{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }}>
-            {days.map((d) => {
-              const isToday = isSameDay(d, today);
-              const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-              return (
-                <div
-                  key={d.toISOString()}
-                  className={`text-[10px] tabular-nums text-center py-2 border-r last:border-r-0 ${
-                    isToday
-                      ? "bg-primary/10 text-primary font-semibold"
-                      : isWeekend
-                        ? "text-muted-foreground/60"
-                        : "text-muted-foreground"
-                  }`}
-                >
-                  {format(d, "d")}
+      <div className="card-glass rounded-2xl overflow-hidden">
+        <div className="flex">
+          {/* Sticky left vehicle column */}
+          <div className="w-48 shrink-0 border-r border-white/[0.04] bg-background/20">
+            <div className="h-10 border-b border-white/[0.04] flex items-center px-4 text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+              Vehicle
+            </div>
+            {cars.map((car) => (
+              <div
+                key={car.id}
+                className="h-14 border-b border-white/[0.04] last:border-b-0 px-4 flex flex-col justify-center min-w-0"
+              >
+                <div className="text-sm font-medium tracking-tight truncate">
+                  {car.brand} {car.model}
                 </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Rows */}
-        <div className="divide-y">
-          {cars.map((car, rowIdx) => {
-            const rental = car.currentRental;
-            const monthStart = startOfMonth(anchor);
-            const monthEnd = endOfMonth(anchor);
-
-            let bar: { left: number; width: number } | null = null;
-            if (rental) {
-              const start = new Date(rental.startDate);
-              const end = new Date(rental.endDate);
-              const overlaps = end >= monthStart && start <= monthEnd;
-              if (overlaps) {
-                const clampedStart = clampToMonth(start, anchor);
-                const clampedEnd = clampToMonth(end, anchor);
-                const startIdx = clampedStart.getDate() - 1;
-                const endIdx = clampedEnd.getDate() - 1;
-                const total = days.length;
-                const left = (startIdx / total) * 100;
-                const width = ((endIdx - startIdx + 1) / total) * 100;
-                bar = { left, width };
-              }
-            }
-
-            return (
-              <div key={car.id} className="flex hover:bg-muted/30 transition-colors group">
-                <div className="w-44 shrink-0 px-4 py-3 border-r min-w-0">
-                  <div className="text-sm font-medium truncate">
-                    {car.brand} {car.model}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground tabular-nums truncate">
-                    {car.plate}
-                  </div>
-                </div>
-                <div
-                  className="flex-1 relative grid"
-                  style={{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }}
-                >
-                  {/* day cells (background grid) */}
-                  {days.map((d, i) => {
-                    const isToday = isSameDay(d, today);
-                    const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-                    return (
-                      <div
-                        key={i}
-                        className={`h-12 border-r last:border-r-0 ${
-                          isToday
-                            ? "bg-primary/[0.04]"
-                            : isWeekend
-                              ? "bg-muted/30"
-                              : ""
-                        }`}
-                      />
-                    );
-                  })}
-
-                  {/* today line */}
-                  {(() => {
-                    const todayInMonth =
-                      today >= monthStart && today <= monthEnd;
-                    if (!todayInMonth) return null;
-                    const idx = today.getDate() - 1;
-                    const left = ((idx + 0.5) / days.length) * 100;
-                    return (
-                      <div
-                        className="absolute top-0 bottom-0 w-px bg-primary/60 z-10 pointer-events-none"
-                        style={{ left: `${left}%` }}
-                      />
-                    );
-                  })()}
-
-                  {/* rental bar */}
-                  {bar && rental && (
-                    <motion.div
-                      initial={{ opacity: 0, scaleX: 0.6 }}
-                      animate={{ opacity: 1, scaleX: 1 }}
-                      transition={{
-                        duration: 0.5,
-                        delay: rowIdx * 0.04,
-                        ease: [0.16, 1, 0.3, 1],
-                      }}
-                      style={{
-                        left: `${bar.left}%`,
-                        width: `${bar.width}%`,
-                        transformOrigin: "left",
-                      }}
-                      className="absolute top-2 bottom-2 rounded-md bg-primary/90 hover:bg-primary text-primary-foreground px-2 py-1 text-[11px] font-medium shadow-sm overflow-hidden flex items-center cursor-default"
-                      title={`${rental.renter.name} · ${format(new Date(rental.startDate), "MMM d")} → ${format(new Date(rental.endDate), "MMM d")}`}
-                    >
-                      <span className="truncate">{rental.renter.name}</span>
-                    </motion.div>
-                  )}
+                <div className="text-[11px] font-mono text-muted-foreground tabular-nums truncate">
+                  {car.plate}
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          {/* Scrollable calendar track */}
+          <div className="flex-1 overflow-x-auto" ref={scrollRef}>
+            <div style={{ width: trackWidth, minWidth: "100%" }}>
+              {/* Day header */}
+              <div className="h-10 border-b border-white/[0.04] flex sticky top-0 bg-background/40 backdrop-blur">
+                {days.map((d) => {
+                  const isToday = isSameDay(d, today);
+                  const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                  return (
+                    <div
+                      key={d.toISOString()}
+                      style={{ width: DAY_WIDTH }}
+                      className={`shrink-0 flex flex-col items-center justify-center text-center border-r border-white/[0.03] last:border-r-0 ${
+                        isToday
+                          ? "text-primary"
+                          : isWeekend
+                            ? "text-muted-foreground/60"
+                            : "text-muted-foreground"
+                      }`}
+                    >
+                      <span className="text-[9px] uppercase tracking-wider">
+                        {format(d, "EEE")}
+                      </span>
+                      <span
+                        className={`text-xs tabular-nums ${
+                          isToday ? "font-semibold" : ""
+                        }`}
+                      >
+                        {format(d, "d")}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Rows */}
+              {cars.map((car, rowIdx) => {
+                const rental = car.currentRental;
+                const monthStart = startOfMonth(anchor);
+                const monthEnd = endOfMonth(anchor);
+
+                let bar: { left: number; width: number } | null = null;
+                if (rental) {
+                  const start = new Date(rental.startDate);
+                  const end = new Date(rental.endDate);
+                  const overlaps = end >= monthStart && start <= monthEnd;
+                  if (overlaps) {
+                    const cs = clampToMonth(start, anchor);
+                    const ce = clampToMonth(end, anchor);
+                    const sIdx = cs.getDate() - 1;
+                    const eIdx = ce.getDate() - 1;
+                    bar = {
+                      left: sIdx * DAY_WIDTH,
+                      width: (eIdx - sIdx + 1) * DAY_WIDTH,
+                    };
+                  }
+                }
+
+                const todayInMonth =
+                  today >= monthStart && today <= monthEnd;
+                const todayLeft = todayInMonth
+                  ? (today.getDate() - 1) * DAY_WIDTH + DAY_WIDTH / 2
+                  : null;
+
+                return (
+                  <div
+                    key={car.id}
+                    className="h-14 border-b border-white/[0.04] last:border-b-0 relative flex"
+                  >
+                    {/* day cells */}
+                    {days.map((d, i) => {
+                      const isToday = isSameDay(d, today);
+                      const isWeekend =
+                        d.getDay() === 0 || d.getDay() === 6;
+                      return (
+                        <div
+                          key={i}
+                          style={{ width: DAY_WIDTH }}
+                          className={`shrink-0 border-r border-white/[0.03] last:border-r-0 ${
+                            isToday
+                              ? "bg-primary/[0.04]"
+                              : isWeekend
+                                ? "bg-white/[0.015]"
+                                : ""
+                          }`}
+                        />
+                      );
+                    })}
+
+                    {/* today line */}
+                    {todayLeft !== null && (
+                      <div
+                        className="absolute top-0 bottom-0 w-px bg-primary/60 z-10 pointer-events-none"
+                        style={{ left: todayLeft }}
+                      />
+                    )}
+
+                    {/* rental pill */}
+                    {bar && rental && (
+                      <motion.button
+                        type="button"
+                        onClick={() => onOpenRenter?.(car)}
+                        initial={{ opacity: 0, scaleX: 0.6 }}
+                        animate={{ opacity: 1, scaleX: 1 }}
+                        whileHover={{ scale: 1.02 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: rowIdx * 0.04,
+                          ease: [0.16, 1, 0.3, 1],
+                        }}
+                        style={{
+                          left: bar.left + 4,
+                          width: bar.width - 8,
+                          transformOrigin: "left",
+                        }}
+                        className="absolute top-2 bottom-2 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary text-primary-foreground px-3 text-[11px] font-medium shadow-lg shadow-primary/20 ring-1 ring-white/10 overflow-hidden flex items-center cursor-pointer"
+                        title={`${rental.renter.name} · ${format(new Date(rental.startDate), "MMM d")} → ${format(new Date(rental.endDate), "MMM d")}`}
+                      >
+                        <span className="truncate">{rental.renter.name}</span>
+                      </motion.button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-2 rounded-sm bg-primary/90" />
+      <div className="flex items-center gap-5 text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-2 rounded-full bg-gradient-to-r from-primary to-primary/80" />
           Active rental
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <div className="w-px h-3 bg-primary/60" />
           Today
         </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-2 rounded-sm bg-muted" />
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-2 rounded-sm bg-white/[0.05]" />
           Weekend
         </div>
       </div>

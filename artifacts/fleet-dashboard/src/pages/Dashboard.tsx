@@ -6,7 +6,9 @@ import { FleetGrid } from "../components/FleetGrid";
 import { TimelineView } from "../components/TimelineView";
 import { MaintenancePanel } from "../components/MaintenancePanel";
 import { ActivityDrawer } from "../components/ActivityDrawer";
+import { RenterProfileDrawer } from "../components/RenterProfileDrawer";
 import { useCars } from "../context/CarsContext";
+import type { Car } from "../data/types";
 import { format } from "date-fns";
 import { Bell, Moon, Sun } from "lucide-react";
 import { useTheme } from "../components/theme-provider";
@@ -19,6 +21,7 @@ export default function Dashboard() {
   const { theme, setTheme } = useTheme();
   const [tab, setTab] = useState<Tab>("overview");
   const [activityOpen, setActivityOpen] = useState(false);
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
 
   const upcomingReturns = cars
     .filter((c) => c.status === "Rented" && c.currentRental)
@@ -39,14 +42,14 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-[100dvh] bg-background text-foreground flex flex-col font-sans">
-      <header className="sticky top-0 z-30 h-14 border-b glass-panel flex items-center px-6 justify-between shrink-0">
+    <div className="min-h-[100dvh] text-foreground flex flex-col font-sans">
+      <header className="sticky top-0 z-30 h-14 border-b border-white/[0.05] glass-panel flex items-center px-6 justify-between shrink-0">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/30 flex items-center justify-center shadow-[0_0_18px_-4px_hsl(var(--primary)/0.4)]">
               <div className="w-2 h-2 rounded-sm bg-primary" />
             </div>
-            <div className="font-semibold tracking-tight text-base">Fleet</div>
+            <div className="font-medium tracking-tight text-base">Fleet</div>
           </div>
           <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
             {tabs.map((t) => (
@@ -62,7 +65,7 @@ export default function Dashboard() {
                 {tab === t.id && (
                   <motion.div
                     layoutId="active-tab"
-                    className="absolute inset-0 bg-muted rounded-md"
+                    className="absolute inset-0 bg-white/[0.06] border border-white/[0.06] rounded-md"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -81,7 +84,7 @@ export default function Dashboard() {
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full" />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_6px_hsl(0_90%_55%/0.8)]" />
             )}
           </Button>
           <Button
@@ -100,17 +103,22 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 py-10 md:py-12 space-y-12">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight mb-1.5">
-            {tab === "overview" ? "Command Center" : "Rental Timeline"}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-6 py-10 md:py-14 space-y-12">
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <h1 className="text-3xl md:text-4xl font-light tracking-tight mb-2">
+            {tab === "overview" ? "Command Center" : "Master Timeline"}
           </h1>
           <p className="text-sm text-muted-foreground">
             {tab === "overview"
               ? `${format(new Date(), "EEEE, MMMM d, yyyy")} — manage your vehicles, rentals, and maintenance.`
-              : "Visualize active rentals across the calendar."}
+              : "Drag horizontally to scroll through the calendar. Click a rental to inspect the renter."}
           </p>
-        </div>
+        </motion.div>
 
         <section>
           <StatsBar />
@@ -120,36 +128,37 @@ export default function Dashboard() {
           {tab === "overview" ? (
             <motion.div
               key="overview"
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col lg:flex-row gap-10"
             >
               <section className="flex-1 min-w-0">
-                <FleetGrid />
+                <FleetGrid onOpenRenter={setSelectedCar} />
               </section>
 
               <aside className="w-full lg:w-80 shrink-0 space-y-10">
                 <MaintenancePanel />
 
                 <section className="space-y-4">
-                  <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                  <h2 className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     Upcoming returns
                   </h2>
                   {upcomingReturns.length === 0 ? (
-                    <div className="text-sm text-muted-foreground border rounded-lg p-4 bg-card/60 backdrop-blur">
+                    <div className="card-glass rounded-xl p-4 text-sm text-muted-foreground">
                       No active rentals.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {upcomingReturns.map((car) => (
-                        <div
+                        <button
                           key={car.id}
-                          className="flex justify-between items-center text-sm p-3 rounded-lg border bg-card/80 backdrop-blur shadow-sm"
+                          onClick={() => setSelectedCar(car)}
+                          className="w-full text-left card-glass rounded-xl p-3 flex justify-between items-center hover:border-white/15 transition-colors"
                         >
                           <div className="min-w-0">
-                            <div className="font-medium truncate">
+                            <div className="font-medium text-sm truncate">
                               {car.brand} {car.model}
                             </div>
                             <div className="text-xs text-muted-foreground mt-0.5 truncate">
@@ -157,14 +166,14 @@ export default function Dashboard() {
                             </div>
                           </div>
                           <div className="text-right shrink-0 ml-3">
-                            <div className="font-medium tabular-nums">
+                            <div className="font-medium tabular-nums text-sm">
                               {format(
                                 new Date(car.currentRental!.endDate),
                                 "MMM d",
                               )}
                             </div>
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -174,12 +183,12 @@ export default function Dashboard() {
           ) : (
             <motion.div
               key="timeline"
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
-              <TimelineView />
+              <TimelineView onOpenRenter={setSelectedCar} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -188,6 +197,10 @@ export default function Dashboard() {
       <ActivityDrawer
         open={activityOpen}
         onClose={() => setActivityOpen(false)}
+      />
+      <RenterProfileDrawer
+        car={selectedCar}
+        onClose={() => setSelectedCar(null)}
       />
     </div>
   );

@@ -3,8 +3,13 @@ import { CarCard } from "./CarCard";
 import { useCars } from "../context/CarsContext";
 import { Input } from "./ui/input";
 import { Search } from "lucide-react";
+import type { Car } from "../data/types";
 
-export function FleetGrid() {
+interface Props {
+  onOpenRenter?: (car: Car) => void;
+}
+
+export function FleetGrid({ onOpenRenter }: Props) {
   const { cars } = useCars();
   const [query, setQuery] = useState("");
 
@@ -23,7 +28,7 @@ export function FleetGrid() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           Fleet
         </h2>
         <div className="relative w-48">
@@ -32,19 +37,24 @@ export function FleetGrid() {
             placeholder="Filter vehicles..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-8 pl-9 text-xs"
+            className="h-8 pl-9 text-xs bg-background/30 backdrop-blur"
           />
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="border rounded-xl p-10 text-center text-sm text-muted-foreground bg-card">
+        <div className="card-glass rounded-xl p-10 text-center text-sm text-muted-foreground">
           No vehicles match your search.
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {filtered.map((car, i) => (
-            <CarCard key={car.id} car={car} index={i} />
+            <CarCard
+              key={car.id}
+              car={car}
+              index={i}
+              onOpenRenter={onOpenRenter}
+            />
           ))}
         </div>
       )}
