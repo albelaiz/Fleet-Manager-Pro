@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from "./ui/sheet";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Car } from "../data/types";
 import { useToast } from "../hooks/use-toast";
+import { Separator } from "./ui/separator";
 
 const formSchema = z.object({
   plate: z.string().min(2, "Plate is required"),
@@ -65,166 +65,170 @@ export function AddCarSheet({ onAdd }: { onAdd: (car: Car) => void }) {
     setOpen(false);
     form.reset();
     toast({
-      title: "Car added",
-      description: `${newCar.brand} ${newCar.model} has been added to your fleet.`,
+      title: "Vehicle added",
+      description: `${newCar.brand} ${newCar.model} has been added to the fleet.`,
     });
   };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" /> Add Car
+        <Button size="sm" className="gap-1.5 h-8 px-3">
+          <Plus className="w-3.5 h-3.5" /> Add vehicle
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Add New Vehicle</SheetTitle>
-          <SheetDescription>
-            Enter the details for the new car. It will be added to your fleet immediately.
-          </SheetDescription>
-        </SheetHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground border-b pb-2">General Info</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="plate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Plate Number</FormLabel>
-                      <FormControl>
-                        <Input placeholder="XYZ-123" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="year"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Year</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+      <SheetContent className="w-full sm:max-w-md overflow-y-auto border-l sm:border-l sm:rounded-l-2xl pr-0">
+        <div className="pr-6">
+          <SheetHeader className="mb-6">
+            <SheetTitle className="text-xl">Add vehicle</SheetTitle>
+            <SheetDescription>
+              Enter the details for the new car.
+            </SheetDescription>
+          </SheetHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="space-y-4">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Vehicle details</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="plate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Plate Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="XYZ-123" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Year</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Brand</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Toyota" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Model</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Corolla" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="brand"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Brand</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Toyota" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="model"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Model</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Corolla" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
 
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground border-b pb-2">Maintenance Metrics</h4>
-              <FormField
-                control={form.control}
-                name="currentKm"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Odometer (km)</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid grid-cols-2 gap-4">
+              <Separator />
+
+              <div className="space-y-4">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Maintenance schedule</h4>
                 <FormField
                   control={form.control}
-                  name="lastOilChangeKm"
+                  name="currentKm"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Oil Change (km)</FormLabel>
+                      <FormLabel className="text-xs">Current Odometer (km)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" {...field} className="h-9" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="oilChangeIntervalKm"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Oil Interval (km)</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="lastOilChangeKm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Last Oil Change (km)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="oilChangeIntervalKm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Oil Interval (km)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="lastTireChangeDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Last Tire Change</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="insuranceExpiryDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">Insurance Expiry</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} className="h-9" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="lastTireChangeDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Tire Change</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="insuranceExpiryDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Insurance Expiry</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-            
-            <SheetFooter>
-              <Button type="submit" className="w-full">Save Vehicle</Button>
-            </SheetFooter>
-          </form>
-        </Form>
+              
+              <SheetFooter className="mt-8">
+                <Button type="submit" className="w-full">Save vehicle</Button>
+              </SheetFooter>
+            </form>
+          </Form>
+        </div>
       </SheetContent>
     </Sheet>
   );
